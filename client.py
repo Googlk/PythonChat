@@ -21,27 +21,41 @@ class UseServer:
                 break
             else:
                 print ('连接服务器 %s 成功'%IPLISTS[times])
+                global ConnectStat
+                ConnectStat = 'Success'
                 break
-            Connect = 'Success'
+        ConnectStat = 'Failed'
+    def CheckIPUpdate():
+        Version = IPLISTS[-1]
+        if ConnectStat == 'Success':
+            try:
+                GetVersion = s.recv(5)
+            except:
+                print ('检查更新失败，跳过')
+            else:
+                GetVersion = GetVersion.decode('utf-8')
+                if float(GetVersion) > float(IPVERSION):
+                    VersionStat = 'old'
+                    s.send(VersionStat.encode('utf-8'))
+                else:
+                    VersionStat = 'new'
+                    s.send(VersionStat.encode('utf-8'))
+        else:
+            pass
     def Login():
         while True:
             LoginName = input("请输入您想作为在线的账号(可以使用中文，英文，数字)：")
             if len(LoginName) >= 15:
                 print ('名称不可以过长哦，请重新输一个~')
+            elif (len(LoginName)) == 0:
+                    print ('名字是一定要有的~~没有就傻傻分不清楚')
             else:
                 break
-        LoginName = LoginName.encode('utf-8')
-    def CheckIPUpdate():
-        Version = IPLISTS[-1]
-        try:
-            GetVersion = s.recv(5)
-        except:
-            print ('检查更新失败，跳过')
-        else:
-            GetVersion = GetVersion.decode('utf-8')
-            print (GetVersion)
     def SendName():
-         s.send(LoginName)
+        LoginName = LoginName.encode('utf-8')
+        s.send(LoginName)
+    def SendLoginUDP():
+        udps = socket.socket(socket.AF_INIT,socket.SOCK_DGRAM)
 def Surface():
     print (
     """
@@ -61,5 +75,4 @@ def Surface():
                                          作者：guiqiqi187@gamil.com
     """)
     time.sleep(10.0)
-UseServer.Connect()
-UseServer.CheckIPUpdate()
+Surface()
